@@ -1,81 +1,74 @@
 class Owner
-  # code goes here	  @@all= []
-end 	  attr_accessor :pets, :cats, :dogs
   attr_reader :name, :species
-
-  def initialize(species="human", name)
-    @species = species
+  
+  @@all = []
+  
+  def initialize(name, species = "human")
     @name = name
-    @@all << self
-    @cats = []
-    @dogs = []
-
+    @species = species
+    save
   end
-
-  def cats
-    Cat.all.select do |cat|
-    cat.owner == self
-  end
-end
-
-  def dogs
-    Dog.all.select do |dog|
-    dog.owner == self
-  end
-end
-
+  
   def say_species
-      "I am a #{@species}."
+    "I am a #{@species}."
   end
-
-  def self.all
-      @@all
-  end
-
+  
   def save
     @@all << self
   end
-
+  
+  def self.all
+    @@all
+  end
+  
   def self.count
-      @@all.count
+    @@all.count
   end
-
+  
   def self.reset_all
-      @@all.clear
-      @@all
+    @@all.clear
   end
-
-  def buy_cat(name)
-    Cat.new(name, self)
+  
+  def cats 
+    Cat.all.select { |cat| cat.owner == self}
   end
-
-  def buy_dog(name)
-    Dog.new(name, self)
+  def dogs 
+    Dog.all.select { |dog| dog.owner == self}
   end
-
+  
+  def buy_cat(cat)
+    cats << Cat.new(cat,self)
+  end
+  
+  def buy_dog(dog)
+    dogs << Dog.new(dog,self)
+  end
+  
   def walk_dogs
-   self.dogs.each {|dog| dog.mood = "happy"}
-  end
-
-  def feed_cats
-    self.cats.each {|cat| cat.mood = "happy"}
-  end
-
-  def sell_pets	
-        all_pets = self.cats + self.dogs	
-        all_pets.each do |pet|	
-            sell_pet(pet)	
-        end	
-    end	
-
-    def sell_pet(pet)	
-        pet.owner = nil	
-        pet.mood = "nervous"	
-  end
-
-  def list_pets	
-        number_of_dogs = self.dogs.count	
-        number_of_cats = self.cats.count	
-        return "I have #{number_of_dogs} dog(s), and #{number_of_cats} cat(s)."	
+    dogs.each do |dog|
+      dog.mood = "happy"
     end
-  end 
+  end
+  
+  def feed_cats
+    cats.each do |cat|
+      cat.mood = "happy"
+    end
+  end
+  
+  def sell_pets
+    dogs.each do |dog|
+      dog.mood = "nervous"
+      dog.owner = nil
+    end
+    cats.each do |cat|
+      cat.mood = "nervous"
+      cat.owner = nil
+    end
+  end
+  
+  def list_pets
+    "I have #{dogs.count} dog(s), and #{cats.count} cat(s)."
+  end
+  
+end
